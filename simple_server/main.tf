@@ -3,6 +3,14 @@ provider "citrixadc" {
   password = var.password
 }
 
+terraform {
+  required_providers {
+    citrixadc = {
+      source = "citrix/citrixadc"
+    }
+  }
+}
+
 variable "password" {
   description = "Password for ADC"
 }
