@@ -1,5 +1,5 @@
 provider "citrixadc" {
-  endpoint = "http://10.217.107.133"
+  endpoint = format("http://%s", var.nsip)
   password = var.password
 }
 
@@ -13,6 +13,9 @@ terraform {
 
 variable "password" {
   description = "Password for ADC"
+}
+variable "nsip" {
+  description = "NSIP for ADC"
 }
 
 resource "citrixadc_server" "test_server" {
