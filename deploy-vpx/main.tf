@@ -34,6 +34,8 @@ variable "memory" {
 variable "num_cpus" {
   default = 2 
 }
+variable "new_adc_password" {
+}
 
 ######################################################
 
@@ -44,6 +46,20 @@ provider "vsphere" {
 
   # If you have a self-signed cert
   allow_unverified_ssl = true
+}
+
+######################################################
+provider "citrixadc" {
+  endpoint = format("http://%s", var.vpx_nsip)
+  password = var.new_adc_password
+}
+
+terraform {
+  required_providers {
+    citrixadc = {
+      source = "citrix/citrixadc"
+    }
+  }
 }
 
 ######################################################
@@ -100,4 +116,20 @@ resource "vsphere_virtual_machine" "citrixVPX" {
       "eth0.ipAddress" : var.vpx_nsip
     }
   }
+}
+
+# Give some time for ADC to boot up properly
+# and have NITRO run on NSIP
+resource "time_sleep" "time_buffer" {
+  create_duration = "3m"
+  depends_on = [ vsphere_virtual_machine.citrixVPX ]
+}
+
+# First time password reset after the time buffer
+# NITRO should be up for this to succeed
+resource "citrixadc_password_resetter" "tf_resetter" {
+    username = "nsroot"
+    password = "nsroot"
+    new_password = var.new_adc_password
+    depends_on = [ time_sleep.time_buffer ]
 }
