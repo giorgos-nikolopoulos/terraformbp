@@ -69,7 +69,7 @@ resource "citrixadc_nsip" "nsip76" {
 }
 
 resource "citrixadc_vlan_interface_binding" "if_bind60" {
-    vlanid = citrixadc_vlan.vlan50.vlanid
+    vlanid = citrixadc_vlan.vlan60.vlanid
     ifnum = "1/1"
 }
 
